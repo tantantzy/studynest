@@ -103,19 +103,43 @@ function courseCard(c){return `<article class="card course-card">
   <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-secondary" data-edit-course="${c.id}">Edit</button>
   <button class="btn btn-danger" data-delete-course="${c.id}">Delete</button></div></div></article>`}
 async function loadCourses(){
-  const grid=$('#courseGrid');if(!grid)return;
   const user=await userOrStop();if(!user)return;
-  const {data,error}=await studyNest.from('courses').select('*').eq('user_id',user.id).order('created_at',{ascending:false});
-  if(error)return toast(error.message);
+  const {data,error}=await studyNest
+    .from('courses')
+    .select('*')
+    .eq('user_id',user.id)
+    .order('created_at',{ascending:false});
+
+  if(error){
+    toast(error.message);
+    return;
+  }
+
   courseCache=data||[];
-  grid.innerHTML=courseCache.map(courseCard).join('')||'<div class="empty card">No courses yet. Click “Add course” to begin.</div>';
+
+  // Populate course dropdowns on Dashboard, Tasks, Notes and Progress.
   fillCourseSelects();
+
+  const grid=$('#courseGrid');
+  if(grid){
+    grid.innerHTML=courseCache.map(courseCard).join('')||
+      '<div class="empty card">No courses yet. Click “Add course” to begin.</div>';
+  }
 }
 function fillCourseSelects(){
   $$('[data-course-select]').forEach(select=>{
     const current=select.value;
-    select.innerHTML='<option value="">No course</option>'+courseCache.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('');
-    select.value=current;
+    const options=courseCache.map(c=>
+      `<option value="${c.id}">${esc(c.title)}</option>`
+    ).join('');
+
+    select.innerHTML=courseCache.length
+      ? '<option value="">Choose a course (optional)</option>'+options
+      : '<option value="">No courses yet — create one first</option>';
+
+    if([...select.options].some(option=>option.value===current)){
+      select.value=current;
+    }
   });
 }
 $('#courseForm')?.addEventListener('submit',async e=>{
