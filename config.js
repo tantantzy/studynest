@@ -1,6 +1,6 @@
 // StudyNest Supabase configuration.
 // Replace these two values with Project Settings > API values.
 window.STUDYNEST_CONFIG = {
-  supabaseUrl: "https://mfrpcpdshetxsibleiwa.supabase.co",
-  supabaseAnonKey: "sb_publishable_sWYwZ8sVoohF16ee9NyqWw_AGyasDkS"
+  supabaseUrl: "https://YOUR_PROJECT.supabase.co",
+  supabaseAnonKey: "YOUR_PUBLIC_ANON_KEY"
 };
